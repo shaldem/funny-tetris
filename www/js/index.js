@@ -6,7 +6,7 @@ window.onload = function(){
     }
 
     if( window.isphone ) {
-        document.addEventListener("deviceready", onDeviceReady, false);
+        document.addEventListener("deviceready", app.onDeviceReady, false);
     } else {
         app.onDeviceReady();
     }
@@ -14,7 +14,6 @@ window.onload = function(){
 
 
 var app = {
-    // Update DOM on a Received Event
     onDeviceReady: function(id) {
         var eScore = document.getElementById("sc");
         var score = 0;
@@ -46,42 +45,60 @@ var app = {
 
             flist: [square,coner,stick],
 
-            rotL: function () {
-                this.curr.state = this.curr.state == 0 ? 3 : this.curr.state - 1;
+            checkRotL: function(x, y) {
+                figure.rotL();
+                if(!figure.checkRot(x, y) || figure.boardB(x,y) || !figure.boardRL(x,y))
+                    figure.rotR();
             },
-            rotR: function () {
-                this.curr.state = this.curr.state == 3 ? 0 : this.curr.state + 1;
+            checkRotR: function(x, y) {
+                figure.rotR();
+                if(!figure.checkRot(x, y) || figure.boardB(x,y) || !figure.boardRL(x,y))
+                    figure.rotL();
             },
             glArrSet: function (x,y) {
-                for(var i = 0; i < this.getW(); i++){
-                    for(var j = 0; j < this.getH(); j++){
+                for(var i = 0; i < figure.getW(); i++){
+                    for(var j = 0; j < figure.getH(); j++){
                         if(!fArr[x+i][y+j])
-                            fArr[x+i][y+j] = this.flist[this.curr.shape].pict[this.curr.state][i][j];
+                            fArr[x+i][y+j] = figure.flist[figure.curr.shape].pict[figure.curr.state][i][j];
                     }
                 }
             },
             glArrClr: function (x,y) {
-                for(var i = 0; i < this.getW(); i++){
-                    for(var j = 0; j < this.getH(); j++){
-                        if(this.flist[this.curr.shape].pict[this.curr.state][i][j])
+                for(var i = 0; i < figure.getW(); i++){
+                    for(var j = 0; j < figure.getH(); j++){
+                        if(figure.flist[figure.curr.shape].pict[figure.curr.state][i][j])
                             fArr[x+i][y+j] = 0;
                     }
                 }
             },
-            onMoveR: function (x,y) {
-                this.glArrClr(x,y);
-            },
-            onMoveL: function (x,y) {
-                this.glArrClr(x,y);
-            },
             boardL: function (x,y) {
-                // @todo shape
-                return (x > 0 && (fArr[x - 1][y] === 0));
+                var h = figure.getH();
+                var br = (x > 0);
+                if(br) {
+                    for(var i = 0; i < h; i++)
+                        if (fArr[x - 1][y+i] != 0) {
+                            br = false;
+                            break;
+                        }
+                }
+                return br;
             },
             boardR: function (x,y) {
-                // @todo shape
                 var w = figure.getW();
-                return (x < (fWlen - w) && (fArr[x + w][y] === 0));
+                var h = figure.getH();
+
+                var br = (x < (fWlen - w));
+                if(br) {
+                    for(var i = 0; i < h; i++)
+                        if (fArr[x + w][y + i] !== 0) {
+                            br = false;
+                            break;
+                        }
+                }
+                return br;
+            },
+            boardRL: function (x,y) {
+                return (figure.boardL(x,y) && figure.boardR(x,y));
             },
             boardT: function (x) {
                 var stop = false;
@@ -101,7 +118,7 @@ var app = {
 
                 if(!dnBotRed) {
                     for(var i=0; i<w; i++) {
-                        var Hi = this.getHi(i);
+                        var Hi = figure.getHi(i);
                         if(y>=0 && fArr[x+i][y+Hi-1] == 1){
                             dnBotRed = true;
                             break;
@@ -111,34 +128,51 @@ var app = {
                 return dnBotRed;
             },
             getRnd: function(){
-                this.getRndF();
-                return  this.getRndX();
+                figure.getRndF();
+                figure.getRndS();
+                return  figure.getRndX();
             },
             getHi: function(i){
 
-                var h = this.getH();
+                var h = figure.getH();
 
-                var Hi = this.flist[this.curr.shape].pict[this.curr.state][i][0];
+                var Hi = figure.flist[figure.curr.shape].pict[figure.curr.state][i][0];
                 for(var j = 1; j < h; j++) {
-                    Hi += this.flist[this.curr.shape].pict[this.curr.state][i][j];
+                    Hi += figure.flist[figure.curr.shape].pict[figure.curr.state][i][j];
                 }
 
                 return Hi;
             },
             /// PRIVATE
+            rotL: function () {
+                figure.curr.state = figure.curr.state == 0 ? 3 : figure.curr.state - 1;
+            },
+            rotR: function () {
+                figure.curr.state = figure.curr.state == 3 ? 0 : figure.curr.state + 1;
+            },
+            checkRot: function(x, y) {
+                var doRotate = true;
+                if (figure.getH() + y > fHlen)
+                    doRotate = false;
+
+                if (doRotate && x + figure.getW() > fWlen)
+                    doRotate = false;
+                return doRotate;
+            },
             getRndX: function(){
-                return  getRandomRound(fWlen-this.getW(), 0);
+                return  getRandomRound(fWlen-figure.getW(), 0);
+            },
+            getRndS: function(){
+                figure.curr.state = getRandomRound(3, 0);
             },
             getRndF: function(){
-                this.curr.shape = getRandomRound(this.flist.length - 1, 0);
-                //this.curr.shape = 0;
-                //this.curr.shape = 2;
+                figure.curr.shape = getRandomRound(figure.flist.length - 1, 0);
             },
             getW: function(){
-                return this.flist[this.curr.shape].pict[this.curr.state].length;
+                return figure.flist[figure.curr.shape].pict[figure.curr.state].length;
             },
             getH: function(){
-                return this.flist[this.curr.shape].pict[this.curr.state][0].length;
+                return figure.flist[figure.curr.shape].pict[figure.curr.state][0].length;
             }
         };
 
@@ -155,7 +189,12 @@ var app = {
                     } else {
                         cnt.fillStyle ="green";
                     }
-                    cnt.fillRect(i*step,j*step,step,step);
+                    cnt.beginPath();
+                    cnt.lineWidth="1";
+                    cnt.strokeStyle="white";
+                    cnt.rect(i*step,j*step,step,step);
+                    cnt.fill();
+                    cnt.stroke();
                 }
             }
         }
@@ -211,8 +250,9 @@ var app = {
                 }
 
                 for(var i = 0; i < rm.length; i++){
-                    removeString(rm[i]);
+                    removeString(fHlen-1);
                 }
+                drow();
             }
 
             var move = function() {
@@ -230,32 +270,34 @@ var app = {
                         window.removeEventListener("keydown", function(){});
                         alert("GAME OVER!!! Your score " + score + "!!!");
                         clearInterval(inter);
-                        return;
+                        return -1;
                     }
 
                     checkBonus();
                     x = figure.getRnd();
                     y = 0;
+                    return 0;
                 }
+                return 1;
             }
 
             window.addEventListener("keydown", function(e) {
                 var key = e.which;
                 if (key == "37" && figure.boardL(x,y)) {
-                    figure.onMoveL(x,y);
+                    figure.glArrClr(x,y);
                     x -= 1;
                 }
                 if (key == "39" && figure.boardR(x,y)) {
-                    figure.onMoveR(x,y);
+                    figure.glArrClr(x,y);
                     x += 1;
                 }
 
                 if (key == "38") {
-                    figure.rotL();
+                    figure.checkRotL(x,y);
                 }
 
                 if (key == "40") {
-                    figure.rotR();
+                    while(move() == 1);
                 }
             });
 
