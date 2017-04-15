@@ -36,6 +36,9 @@ var app = {
         var stick = {
             pict: [[[1],[1],[1],[1]], [[1,1,1,1]], [[1],[1],[1],[1]], [[1,1,1,1]]]
         }
+        var zigzag = {
+            pict: [[[1,1,0],[0,1,1]], [[1,0],[1,1],[0,1]], [[0,1,1],[1,1,0]], [[0,1],[1,1],[1,0]]]
+        }
 
         var figure = {
             curr: {
@@ -43,7 +46,7 @@ var app = {
                 state: 0
             },
 
-            flist: [square,coner,stick],
+            flist: [square,coner,stick,zigzag],
 
             checkRotL: function(x, y) {
                 figure.rotL();
