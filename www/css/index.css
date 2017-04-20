@@ -1,3 +1,37 @@
 canvas {
     background-color: green;
 }
+a.button24 {
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    padding: .5em 2em;
+    outline: none;
+    border-width: 2px 0;
+    border-style: solid none;
+    border-color: #FDBE33 #000 #D77206;
+    border-radius: 6px;
+    background: linear-gradient(#F3AE0F, #E38916) #E38916;
+    transition: 0.2s;
+}
+h1 {
+    color: blue;
+    text-shadow: 5px 2px 4px grey;
+    transition: 0.2s;
+}
+div.cssgoal {
+    top: 10%;
+    left: 10%;
+    position: relative;
+    width:70px;
+    height:70px;
+    font-weight:bolder;
+    font-size: larger;
+    background-color:rgb(255,255,255,0.0);
+}
+@keyframes agoal {
+    0%{ transform: scale(1.0,1.0); color:black;}
+    25%{ transform: scale(5.0,6.0); color:red;}
+    50%{ transform: scale(5.0,6.0); color:red;}
+    100%{ transform: scale(1.0,1.0); color:black;}
+}

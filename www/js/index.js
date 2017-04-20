@@ -1,4 +1,6 @@
-// are we running in native app or in a browser?
+// Copyright  © 2017 shaldem
+// Licensed under the Apache License, Version 2.0
+
 $(document).ready(function(){
     window.isphone = false;
     if(document.URL.indexOf("http://") === -1
@@ -235,6 +237,7 @@ function  onDeviceReady (id) {
 		var removeString = function(y) {
 			score += 1;
 			$('#sc').text(score);
+			$('#sc')[0].style.animation = '';
 
 			for(var i = 0; i < fWlen; i++) {
 				for(var j = y; j > 0; j--) {
@@ -242,6 +245,10 @@ function  onDeviceReady (id) {
 					fArr[i][j] = p;
 				}
 			}
+
+			setTimeout(function() {
+				$('#sc')[0].style.animation = 'agoal 1s linear';
+			}, 10);
 		}
 
 		var checkBonus = function() {
